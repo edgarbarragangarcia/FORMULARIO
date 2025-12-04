@@ -127,24 +127,16 @@ async function runTestWithIntentionLevel(level) {
     document.querySelector('.btn-next[data-next="3"]').click();
     await sleep(600);
 
-    // Paso 3: Necesidades (seleccionar según nivel)
-    let needsToSelect = [];
-    if (level === 'high') {
-        needsToSelect = ['operacion-hijos', 'evaluar-salud'];
-    } else if (level === 'medium') {
-        needsToSelect = ['evaluar-salud'];
-    } else {
-        needsToSelect = ['preservar-fertilidad'];
-    }
+    // Paso 3: DETENER Y ESPERAR SELECCIÓN MANUAL
+    testBtn.textContent = `⏸️ Selecciona opciones (${level.toUpperCase()})`;
+    showNotification('👆 Selecciona las opciones que necesites y se continuará automáticamente', 'info');
 
-    for (const value of needsToSelect) {
-        const card = document.querySelector(`.need-card[data-value="${value}"]`);
-        if (card && !card.classList.contains('selected')) {
-            card.click();
-            await sleep(500);
-        }
-    }
-    await sleep(800);
+    // Esperar a que el usuario seleccione opciones
+    await waitForUserSelection();
+
+    // Continuar automáticamente después de la selección
+    testBtn.textContent = `⏳ Continuando (${level.toUpperCase()})...`;
+    await sleep(1000);
 
     // Avanzar al paso 4
     document.querySelector('.btn-next[data-next="4"]').click();
@@ -194,6 +186,50 @@ async function runTestWithIntentionLevel(level) {
     showNotification(`✅ Formulario completado - Nivel: ${level.toUpperCase()}`, 'info');
     console.log(`✅ Test completado con nivel de intención: ${level.toUpperCase()}`);
     console.log(`📝 Respuesta generada: "${selectedMessage}"`);
+}
+
+// Esperar a que el usuario seleccione al menos una opción
+function waitForUserSelection() {
+    return new Promise((resolve) => {
+        const needsGrid = document.getElementById('needsGrid');
+        if (!needsGrid) {
+            resolve();
+            return;
+        }
+
+        let selectionMade = false;
+
+        // Listener para detectar cuando se hace una selección
+        const handleSelection = (event) => {
+            const card = event.target.closest('.need-card');
+            if (!card) return;
+
+            // Esperar un momento para que se complete la animación de selección
+            setTimeout(() => {
+                // Verificar si hay al menos una selección
+                const selectedCards = needsGrid.querySelectorAll('.need-card.selected');
+                if (selectedCards.length > 0 && !selectionMade) {
+                    selectionMade = true;
+                    needsGrid.removeEventListener('click', handleSelection);
+
+                    // Pequeño delay antes de continuar
+                    setTimeout(() => {
+                        resolve();
+                    }, 800);
+                }
+            }, 100);
+        };
+
+        needsGrid.addEventListener('click', handleSelection);
+
+        // Timeout de seguridad (30 segundos)
+        setTimeout(() => {
+            if (!selectionMade) {
+                needsGrid.removeEventListener('click', handleSelection);
+                resolve();
+            }
+        }, 30000);
+    });
 }
 
 // Función auxiliar para simular escritura
