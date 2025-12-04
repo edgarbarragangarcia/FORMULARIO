@@ -320,11 +320,35 @@ function handleFormSubmit(e) {
     // Mostrar animación de carga
     showLoadingState();
 
-    // Simular envío (aquí conectarías con tu backend)
-    setTimeout(() => {
-        console.log('Datos del formulario:', formData);
-        showSuccessMessage();
-    }, 1500);
+    // Enviar datos al webhook de n8n
+    fetch('https://n8nqa.ingenes.com:5689/webhook-test/scoreN8N', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Respuesta del servidor:', data);
+            console.log('Datos enviados:', formData);
+            showSuccessMessage();
+        })
+        .catch(error => {
+            console.error('Error al enviar el formulario:', error);
+            console.log('Datos que se intentaron enviar:', formData);
+
+            // Mostrar mensaje de error al usuario
+            showErrorMessage('Hubo un problema al enviar el formulario. Por favor, intenta de nuevo.');
+
+            // Restaurar el botón de envío
+            resetSubmitButton();
+        });
 }
 
 // Recopilar datos del formulario
@@ -354,6 +378,52 @@ function showLoadingState() {
 
     buttonText.textContent = 'Enviando... ';
     buttonIcon.textContent = '⏳';
+}
+
+// Mostrar mensaje de error
+function showErrorMessage(message) {
+    const notification = document.createElement('div');
+    notification.className = 'notification error-notification';
+    notification.innerHTML = `
+        <strong>⚠️ Error</strong><br>
+        ${message}
+    `;
+    notification.style.cssText = `
+        position: fixed;
+        top: 2rem;
+        right: 2rem;
+        padding: 1.5rem 2rem;
+        background: linear-gradient(135deg, #f5576c 0%, #e63946 100%);
+        color: white;
+        border-radius: 16px;
+        box-shadow: 0 12px 32px rgba(245, 87, 108, 0.4);
+        z-index: 9999;
+        animation: slideInRight 0.3s ease;
+        font-weight: 600;
+        max-width: 400px;
+        line-height: 1.5;
+    `;
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }, 5000);
+}
+
+// Resetear botón de envío
+function resetSubmitButton() {
+    const submitBtn = document.querySelector('.btn-submit');
+    const buttonText = submitBtn.childNodes[0];
+    const buttonIcon = submitBtn.querySelector('.btn-arrow');
+
+    submitBtn.disabled = false;
+    submitBtn.style.opacity = '1';
+    submitBtn.style.cursor = 'pointer';
+
+    buttonText.textContent = 'Enviar Formulario ';
+    buttonIcon.textContent = '✓';
 }
 
 // Mostrar mensaje de éxito
