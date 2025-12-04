@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Formulario de Onboarding - Evaluación de necesidades reproductivas">
+    <title>Ingenes - Formulario de Onboarding</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="background-gradient"></div>
+    <div class="container">
+        <header class="form-header">
+            <div class="logo-section">
+                <div class="logo-circle"></div>
+                <h1>Ingenes</h1>
+            </div>
+            <p class="subtitle">Formulario de Onboarding</p>
+        </header>
+
+        <form id="onboardingForm" class="form-content">
+            <!-- Pregunta 1: Nombre -->
+            <div class="form-group fade-in">
+                <label for="nombre" class="form-label">
+                    <span class="label-icon">👤</span>
+                    ¿Cómo te llamas?
+                </label>
+                <input 
+                    type="text" 
+                    id="nombre" 
+                    name="nombre" 
+                    class="form-input"
+                    placeholder="Ingresa tu nombre completo"
+                    required
+                >
+            </div>
+
+            <!-- Pregunta 2: Edad -->
+            <div class="form-group fade-in" style="animation-delay: 0.1s">
+                <label for="edad" class="form-label">
+                    <span class="label-icon">🎂</span>
+                    ¿Cuál es tu edad?
+                </label>
+                <input 
+                    type="number" 
+                    id="edad" 
+                    name="edad" 
+                    class="form-input"
+                    placeholder="Ingresa tu edad"
+                    min="18"
+                    max="100"
+                    required
+                >
+            </div>
+
+            <!-- Pregunta 3: Necesidades (Lista de opciones) -->
+            <div class="form-group fade-in" style="animation-delay: 0.2s">
+                <label class="form-label section-label">
+                    <span class="label-icon">💡</span>
+                    Queremos entender qué necesitas
+                </label>
+                <p class="helper-text">Puedes marcar más de una necesidad:</p>
+                
+                <div class="options-list" id="needsList">
+                    <div class="option-item" data-value="bebe-intentando">
+                        <div class="option-checkbox"></div>
+                        <div class="option-content">
+                            <p class="option-text">Estamos intentando tener un bebé, pero aún no lo hemos conseguido</p>
+                        </div>
+                    </div>
+
+                    <div class="option-item" data-value="operacion-hijos">
+                        <div class="option-checkbox"></div>
+                        <div class="option-content">
+                            <p class="option-text">Me operaron para no tener hijos y ahora quiero tener un bebé</p>
+                        </div>
+                    </div>
+
+                    <div class="option-item" data-value="sin-pareja">
+                        <div class="option-checkbox"></div>
+                        <div class="option-content">
+                            <p class="option-text">No tengo pareja y quiero tener un bebé</p>
+                        </div>
+                    </div>
+
+                    <div class="option-item" data-value="mismo-sexo">
+                        <div class="option-checkbox"></div>
+                        <div class="option-content">
+                            <p class="option-text">Quiero tener un bebé con mi pareja del mismo sexo</p>
+                        </div>
+                    </div>
+
+                    <div class="option-item" data-value="preservar-fertilidad">
+                        <div class="option-checkbox"></div>
+                        <div class="option-content">
+                            <p class="option-text">Quiero preservar mi fertilidad (congelar óvulos o esperma)</p>
+                        </div>
+                    </div>
+
+                    <div class="option-item" data-value="evaluar-salud">
+                        <div class="option-checkbox"></div>
+                        <div class="option-content">
+                            <p class="option-text">No estoy buscando un bebé todavía, pero quiero evaluar mi salud reproductiva con un test/diagnóstico de fertilidad</p>
+                        </div>
+                    </div>
+
+                    <div class="option-item" data-value="no-mas-hijos">
+                        <div class="option-checkbox"></div>
+                        <div class="option-content">
+                            <p class="option-text">Quiero operarme para no tener más hijos</p>
+                        </div>
+                    </div>
+
+                    <div class="option-item" data-value="salud-sexual">
+                        <div class="option-checkbox"></div>
+                        <div class="option-content">
+                            <p class="option-text">Quiero una evaluación de Salud Sexual (menopausia - andropausia)</p>
+                        </div>
+                    </div>
+
+                    <div class="option-item" data-value="genetico-sexo">
+                        <div class="option-checkbox"></div>
+                        <div class="option-content">
+                            <p class="option-text">Quiero un diagnóstico o tratamiento genético reproductivo o elegir el sexo del bebé</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pregunta 4: Razón del tratamiento -->
+            <div class="form-group fade-in" style="animation-delay: 0.3s">
+                <label for="razon" class="form-label">
+                    <span class="label-icon">💭</span>
+                    ¿Por qué crees que requieres un tratamiento de fertilidad o test de salud reproductiva?
+                </label>
+                <textarea 
+                    id="razon" 
+                    name="razon" 
+                    class="form-textarea"
+                    placeholder="Cuéntanos más sobre tu situación..."
+                    rows="4"
+                    required
+                ></textarea>
+            </div>
+
+            <!-- Pregunta 5: Código Postal -->
+            <div class="form-group fade-in" style="animation-delay: 0.4s">
+                <label for="codigoPostal" class="form-label">
+                    <span class="label-icon">📍</span>
+                    ¿Cuál es tu código postal?
+                </label>
+                <input 
+                    type="text" 
+                    id="codigoPostal" 
+                    name="codigoPostal" 
+                    class="form-input"
+                    placeholder="Ej: 06600"
+                    pattern="[0-9]{5}"
+                    required
+                >
+            </div>
+
+            <!-- Pregunta 6: Ubicación de atención -->
+            <div class="form-group fade-in" style="animation-delay: 0.5s">
+                <label for="ubicacion" class="form-label">
+                    <span class="label-icon">🏥</span>
+                    ¿Dónde quieres ser atendida/o?
+                </label>
+                <select id="ubicacion" name="ubicacion" class="form-select" required>
+                    <option value="">Selecciona una ubicación</option>
+                    <option value="cdmx-centro">Ciudad de México - Centro</option>
+                    <option value="cdmx-sur">Ciudad de México - Sur</option>
+                    <option value="guadalajara">Guadalajara</option>
+                    <option value="monterrey">Monterrey</option>
+                    <option value="puebla">Puebla</option>
+                    <option value="queretaro">Querétaro</option>
+                    <option value="otro">Otro</option>
+                </select>
+            </div>
+
+            <!-- Pregunta 7: Teléfono -->
+            <div class="form-group fade-in" style="animation-delay: 0.6s">
+                <label for="telefono" class="form-label">
+                    <span class="label-icon">📱</span>
+                    ¿Cuál es tu teléfono? <span class="required-badge">Obligatorio</span>
+                </label>
+                <input 
+                    type="tel" 
+                    id="telefono" 
+                    name="telefono" 
+                    class="form-input"
+                    placeholder="Ej: 55 1234 5678"
+                    pattern="[0-9]{10}"
+                    required
+                >
+            </div>
+
+            <!-- Pregunta 8: Email -->
+            <div class="form-group fade-in" style="animation-delay: 0.7s">
+                <label for="email" class="form-label">
+                    <span class="label-icon">📧</span>
+                    ¿Cuál es tu e-mail/correo electrónico?
+                </label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    class="form-input"
+                    placeholder="tucorreo@ejemplo.com"
+                    required
+                >
+            </div>
+
+            <!-- Botón de envío -->
+            <div class="form-group fade-in" style="animation-delay: 0.8s">
+                <button type="submit" class="submit-button" id="submitBtn">
+                    <span class="button-text">Enviar Formulario</span>
+                    <span class="button-icon">→</span>
+                </button>
+            </div>
+        </form>
+
+        <!-- Mensaje de éxito -->
+        <div class="success-message" id="successMessage">
+            <div class="success-icon">✓</div>
+            <h2>¡Formulario enviado con éxito!</h2>
+            <p>Nos pondremos en contacto contigo pronto.</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
