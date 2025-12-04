@@ -13,7 +13,56 @@ document.addEventListener('DOMContentLoaded', function () {
     setupOptionsList();
     setupFormValidation();
     updateProgressBar();
+    setupTestMode();
 });
+
+// Configurar modo de prueba (presiona Ctrl+Shift+T)
+function setupTestMode() {
+    document.addEventListener('keydown', function (e) {
+        // Ctrl+Shift+T o Cmd+Shift+T para activar test mode
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'T') {
+            e.preventDefault();
+            fillTestData();
+            showNotification('Formulario llenado con datos de prueba', 'info');
+        }
+    });
+}
+
+// Llenar formulario con datos de prueba
+function fillTestData() {
+    // Paso 1: Nombre
+    document.getElementById('nombre').value = 'María García López';
+
+    // Paso 2: Edad
+    document.getElementById('edad').value = '32';
+
+    // Paso 3: Necesidades (seleccionar algunas opciones)
+    const needsToSelect = ['operacion-hijos', 'evaluar-salud'];
+    needsToSelect.forEach(value => {
+        const card = document.querySelector(`.need-card[data-value="${value}"]`);
+        if (card && !card.classList.contains('selected')) {
+            toggleNeedCard(card);
+        }
+    });
+
+    // Paso 4: Razón
+    document.getElementById('razon').value = 'Queremos tener mucho un bebe y no hemos podido porque somos operados';
+
+    // Paso 5: Código Postal
+    document.getElementById('codigoPostal').value = '06600';
+
+    // Paso 6: Ubicación
+    document.getElementById('ubicacion').value = 'ciudad-mexico';
+
+    // Paso 7: Teléfono
+    document.getElementById('telefono').value = '5512345678';
+
+    // Paso 8: Email
+    document.getElementById('email').value = 'maria.garcia@ejemplo.com';
+
+    console.log('✅ Formulario llenado con datos de prueba');
+    console.log('📝 Presiona los botones "Siguiente" para revisar cada paso');
+}
 
 // Inicializar el formulario
 function initializeForm() {
