@@ -31,9 +31,81 @@ function setupTestMode() {
 
 // Iniciar llenado animado del test
 async function startAnimatedTestFill() {
+    // Mostrar selector de nivel de intención
+    showIntentionLevelSelector();
+}
+
+// Mostrar selector de nivel de intención
+function showIntentionLevelSelector() {
+    const modal = document.createElement('div');
+    modal.className = 'intention-modal';
+    modal.innerHTML = `
+        <div class="intention-modal-content">
+            <h3>🎯 Selecciona el Nivel de Intención</h3>
+            <p class="intention-subtitle">Elige el nivel para entrenar al agente:</p>
+            
+            <div class="intention-options">
+                <button class="intention-btn high" data-level="high">
+                    <span class="intention-icon">🔥</span>
+                    <span class="intention-label">ALTO</span>
+                    <span class="intention-desc">Urgencia clara, problema específico</span>
+                </button>
+                
+                <button class="intention-btn medium" data-level="medium">
+                    <span class="intention-icon">💭</span>
+                    <span class="intention-label">MEDIO</span>
+                    <span class="intention-desc">Interés sin urgencia, explorando</span>
+                </button>
+                
+                <button class="intention-btn low" data-level="low">
+                    <span class="intention-icon">📋</span>
+                    <span class="intention-label">BAJO</span>
+                    <span class="intention-desc">Curiosidad, poca información</span>
+                </button>
+            </div>
+            
+            <button class="intention-cancel">Cancelar</button>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Agregar event listeners
+    const buttons = modal.querySelectorAll('.intention-btn');
+    buttons.forEach(btn => {
+        btn.addEventListener('click', function () {
+            const level = this.getAttribute('data-level');
+            modal.remove();
+            runTestWithIntentionLevel(level);
+        });
+    });
+
+    modal.querySelector('.intention-cancel').addEventListener('click', () => {
+        modal.remove();
+    });
+
+    // Cerrar al hacer clic fuera
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+}
+
+// Ejecutar test con nivel de intención específico
+async function runTestWithIntentionLevel(level) {
     const testBtn = document.getElementById('testModeBtn');
     testBtn.classList.add('running');
-    testBtn.textContent = '⏳ Llenando...';
+    testBtn.textContent = `⏳ Llenando (${level.toUpperCase()})...`;
+
+    // Mensajes según nivel de intención
+    const intentionMessages = {
+        high: 'Queremos tener mucho un bebé y no hemos podido porque somos operados. Ya llevamos 3 años intentándolo y estamos desesperados. Necesitamos ayuda urgente para cumplir nuestro sueño de ser padres.',
+        medium: 'Estamos considerando tener un bebé pero queremos primero evaluar nuestras opciones y entender qué tratamientos existen. No hemos intentado aún pero nos gustaría saber más sobre el proceso.',
+        low: 'Solo estoy buscando información sobre fertilidad. Quizás en el futuro consideremos tener hijos, pero por ahora solo queremos informarnos sobre las posibilidades.'
+    };
+
+    const selectedMessage = intentionMessages[level];
 
     // Ir al paso 1 primero
     goToStep(1);
@@ -55,8 +127,16 @@ async function startAnimatedTestFill() {
     document.querySelector('.btn-next[data-next="3"]').click();
     await sleep(600);
 
-    // Paso 3: Necesidades (seleccionar con delay)
-    const needsToSelect = ['operacion-hijos', 'evaluar-salud'];
+    // Paso 3: Necesidades (seleccionar según nivel)
+    let needsToSelect = [];
+    if (level === 'high') {
+        needsToSelect = ['operacion-hijos', 'evaluar-salud'];
+    } else if (level === 'medium') {
+        needsToSelect = ['evaluar-salud'];
+    } else {
+        needsToSelect = ['preservar-fertilidad'];
+    }
+
     for (const value of needsToSelect) {
         const card = document.querySelector(`.need-card[data-value="${value}"]`);
         if (card && !card.classList.contains('selected')) {
@@ -70,8 +150,8 @@ async function startAnimatedTestFill() {
     document.querySelector('.btn-next[data-next="4"]').click();
     await sleep(600);
 
-    // Paso 4: Razón (con efecto de escritura)
-    await typeText(document.getElementById('razon'), 'Queremos tener mucho un bebe y no hemos podido porque somos operados');
+    // Paso 4: Razón (mensaje según nivel de intención)
+    await typeText(document.getElementById('razon'), selectedMessage);
     await sleep(800);
 
     // Avanzar al paso 5
@@ -111,8 +191,9 @@ async function startAnimatedTestFill() {
     testBtn.classList.remove('running');
     testBtn.textContent = '🧪 Modo Test';
 
-    showNotification('✅ Formulario completado en modo test', 'info');
-    console.log('✅ Test completado - Formulario listo para enviar');
+    showNotification(`✅ Formulario completado - Nivel: ${level.toUpperCase()}`, 'info');
+    console.log(`✅ Test completado con nivel de intención: ${level.toUpperCase()}`);
+    console.log(`📝 Respuesta generada: "${selectedMessage}"`);
 }
 
 // Función auxiliar para simular escritura

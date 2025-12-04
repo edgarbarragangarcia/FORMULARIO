@@ -756,4 +756,173 @@ body {
     .step-title {
         font-size: 1.25rem;
     }
+}/* Modal de selección de nivel de intención */
+.intention-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s ease;
+}
+
+.intention-modal-content {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+    border-radius: 24px;
+    padding: 2.5rem 2rem;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: scaleIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.intention-modal-content h3 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.intention-subtitle {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin-bottom: 2rem;
+}
+
+.intention-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.intention-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1.5rem 1.25rem;
+    background: white;
+    border: 3px solid #e2e8f0;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.intention-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 0;
+}
+
+.intention-btn.high::before {
+    background: linear-gradient(135deg, rgba(245, 87, 108, 0.1) 0%, rgba(230, 57, 70, 0.1) 100%);
+}
+
+.intention-btn.medium::before {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+}
+
+.intention-btn.low::before {
+    background: linear-gradient(135deg, rgba(76, 201, 240, 0.1) 0%, rgba(52, 211, 153, 0.1) 100%);
+}
+
+.intention-btn:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+}
+
+.intention-btn:hover::before {
+    opacity: 1;
+}
+
+.intention-btn.high:hover {
+    border-color: #f5576c;
+}
+
+.intention-btn.medium:hover {
+    border-color: #667eea;
+}
+
+.intention-btn.low:hover {
+    border-color: #4cc9f0;
+}
+
+.intention-icon {
+    font-size: 2.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.intention-label {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    position: relative;
+    z-index: 1;
+}
+
+.intention-desc {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+.intention-cancel {
+    width: 100%;
+    padding: 0.875rem;
+    background: transparent;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.intention-cancel:hover {
+    background: #f7fafc;
+    border-color: #cbd5e0;
+    color: var(--text-primary);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
