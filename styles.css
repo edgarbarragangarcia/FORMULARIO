@@ -117,6 +117,52 @@ body {
     color: rgba(255, 255, 255, 0.9);
     font-weight: 400;
     letter-spacing: 0.02em;
+    margin-bottom: 1rem;
+}
+
+/* Botón de modo test */
+.test-mode-btn {
+    margin-top: 1rem;
+    padding: 0.75rem 1.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.test-mode-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.test-mode-btn:active {
+    transform: translateY(0);
+}
+
+.test-mode-btn.running {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    border-color: #4facfe;
+    animation: pulse 1.5s ease infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        box-shadow: 0 4px 16px rgba(79, 172, 254, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 8px 32px rgba(79, 172, 254, 0.6);
+    }
 }
 
 /* Barra de progreso */

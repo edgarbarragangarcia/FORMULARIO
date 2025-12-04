@@ -16,52 +16,126 @@ document.addEventListener('DOMContentLoaded', function () {
     setupTestMode();
 });
 
-// Configurar modo de prueba (presiona Ctrl+Shift+T)
+// Configurar modo de prueba con botón visible
 function setupTestMode() {
-    document.addEventListener('keydown', function (e) {
-        // Ctrl+Shift+T o Cmd+Shift+T para activar test mode
-        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'T') {
-            e.preventDefault();
-            fillTestData();
-            showNotification('Formulario llenado con datos de prueba', 'info');
-        }
-    });
+    const testBtn = document.getElementById('testModeBtn');
+
+    if (testBtn) {
+        testBtn.addEventListener('click', function () {
+            if (!this.classList.contains('running')) {
+                startAnimatedTestFill();
+            }
+        });
+    }
 }
 
-// Llenar formulario con datos de prueba
-function fillTestData() {
-    // Paso 1: Nombre
-    document.getElementById('nombre').value = 'María García López';
+// Iniciar llenado animado del test
+async function startAnimatedTestFill() {
+    const testBtn = document.getElementById('testModeBtn');
+    testBtn.classList.add('running');
+    testBtn.textContent = '⏳ Llenando...';
+
+    // Ir al paso 1 primero
+    goToStep(1);
+    await sleep(500);
+
+    // Paso 1: Nombre (con efecto de escritura)
+    await typeText(document.getElementById('nombre'), 'María García López');
+    await sleep(800);
+
+    // Avanzar al paso 2
+    document.querySelector('.btn-next[data-next="2"]').click();
+    await sleep(600);
 
     // Paso 2: Edad
-    document.getElementById('edad').value = '32';
+    await typeText(document.getElementById('edad'), '32');
+    await sleep(800);
 
-    // Paso 3: Necesidades (seleccionar algunas opciones)
+    // Avanzar al paso 3
+    document.querySelector('.btn-next[data-next="3"]').click();
+    await sleep(600);
+
+    // Paso 3: Necesidades (seleccionar con delay)
     const needsToSelect = ['operacion-hijos', 'evaluar-salud'];
-    needsToSelect.forEach(value => {
+    for (const value of needsToSelect) {
         const card = document.querySelector(`.need-card[data-value="${value}"]`);
         if (card && !card.classList.contains('selected')) {
-            toggleNeedCard(card);
+            card.click();
+            await sleep(500);
         }
-    });
+    }
+    await sleep(800);
 
-    // Paso 4: Razón
-    document.getElementById('razon').value = 'Queremos tener mucho un bebe y no hemos podido porque somos operados';
+    // Avanzar al paso 4
+    document.querySelector('.btn-next[data-next="4"]').click();
+    await sleep(600);
+
+    // Paso 4: Razón (con efecto de escritura)
+    await typeText(document.getElementById('razon'), 'Queremos tener mucho un bebe y no hemos podido porque somos operados');
+    await sleep(800);
+
+    // Avanzar al paso 5
+    document.querySelector('.btn-next[data-next="5"]').click();
+    await sleep(600);
 
     // Paso 5: Código Postal
-    document.getElementById('codigoPostal').value = '06600';
+    await typeText(document.getElementById('codigoPostal'), '06600');
+    await sleep(800);
+
+    // Avanzar al paso 6
+    document.querySelector('.btn-next[data-next="6"]').click();
+    await sleep(600);
 
     // Paso 6: Ubicación
     document.getElementById('ubicacion').value = 'ciudad-mexico';
+    document.getElementById('ubicacion').dispatchEvent(new Event('change'));
+    await sleep(800);
+
+    // Avanzar al paso 7
+    document.querySelector('.btn-next[data-next="7"]').click();
+    await sleep(600);
 
     // Paso 7: Teléfono
-    document.getElementById('telefono').value = '5512345678';
+    await typeText(document.getElementById('telefono'), '5512345678');
+    await sleep(800);
+
+    // Avanzar al paso 8
+    document.querySelector('.btn-next[data-next="8"]').click();
+    await sleep(600);
 
     // Paso 8: Email
-    document.getElementById('email').value = 'maria.garcia@ejemplo.com';
+    await typeText(document.getElementById('email'), 'maria.garcia@ejemplo.com');
+    await sleep(500);
 
-    console.log('✅ Formulario llenado con datos de prueba');
-    console.log('📝 Presiona los botones "Siguiente" para revisar cada paso');
+    // Restaurar botón
+    testBtn.classList.remove('running');
+    testBtn.textContent = '🧪 Modo Test';
+
+    showNotification('✅ Formulario completado en modo test', 'info');
+    console.log('✅ Test completado - Formulario listo para enviar');
+}
+
+// Función auxiliar para simular escritura
+function typeText(element, text) {
+    return new Promise((resolve) => {
+        element.value = '';
+        let index = 0;
+
+        const interval = setInterval(() => {
+            if (index < text.length) {
+                element.value += text[index];
+                index++;
+            } else {
+                clearInterval(interval);
+                resolve();
+            }
+        }, 30); // 30ms por carácter
+    });
+}
+
+// Función auxiliar para delay
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 // Inicializar el formulario
