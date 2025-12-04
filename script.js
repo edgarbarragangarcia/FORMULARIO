@@ -525,7 +525,7 @@ function handleFormSubmit(e) {
     showLoadingState();
 
     // Enviar datos al webhook de n8n
-    fetch('https://n8nqa.ingenes.com:5689/webhook-test/scoreN8N', {
+    fetch('https://n8nqa.ingenes.com:5689/webhook/scoreN8N', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
