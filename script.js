@@ -771,6 +771,21 @@ function updateSuccessMessageContent(successMessage, webhookResponse) {
             </div>
     `;
 
+    // Agregar la respuesta del usuario
+    if (webhookResponse.respuestaUsuario) {
+        resultadosHTML += `
+            <div class="result-card highlight-card">
+                <div class="result-header">
+                    <span class="result-icon">💬</span>
+                    <h3>Tu Respuesta</h3>
+                </div>
+                <div class="result-content">
+                    <p class="result-text user-response">"${webhookResponse.respuestaUsuario}"</p>
+                </div>
+            </div>
+        `;
+    }
+
     // Agregar información del BEC si está disponible
     if (webhookResponse.bec && webhookResponse.bec.Recomendacion_Principal) {
         resultadosHTML += `
@@ -794,6 +809,21 @@ function updateSuccessMessageContent(successMessage, webhookResponse) {
                     </div>
                     <div class="result-content">
                         <p class="result-text">${webhookResponse.bec.Alternativa_Viable}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Agregar el Argumento de Venta si existe
+        if (webhookResponse.bec.Argumento_Venta) {
+            resultadosHTML += `
+                <div class="result-card highlight-card">
+                    <div class="result-header">
+                        <span class="result-icon">📢</span>
+                        <h3>Por Qué Te Recomendamos Esto</h3>
+                    </div>
+                    <div class="result-content">
+                        <p class="result-text sales-argument">${webhookResponse.bec.Argumento_Venta}</p>
                     </div>
                 </div>
             `;
