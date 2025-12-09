@@ -575,13 +575,15 @@ function handleFormSubmit(e) {
             return response.json();
         })
         .then(data => {
-            console.log('Respuesta del servidor:', data);
-            console.log('Datos enviados:', formData);
-            showSuccessMessage();
+            console.log('✅ Respuesta completa del webhook:', data);
+            console.log('📤 Datos enviados:', formData);
+
+            // Procesar la respuesta del webhook
+            processWebhookResponse(data, formData);
         })
         .catch(error => {
-            console.error('Error al enviar el formulario:', error);
-            console.log('Datos que se intentaron enviar:', formData);
+            console.error('❌ Error al enviar el formulario:', error);
+            console.log('📤 Datos que se intentaron enviar:', formData);
 
             // Mostrar mensaje de error al usuario
             showErrorMessage('Hubo un problema al enviar el formulario. Por favor, intenta de nuevo.');
@@ -652,6 +654,53 @@ function showErrorMessage(message) {
     }, 5000);
 }
 
+// Procesar respuesta del webhook
+function processWebhookResponse(responseData, originalFormData) {
+    console.log('🔍 Procesando respuesta del webhook...');
+
+    // La respuesta puede venir como array o como objeto
+    let data = Array.isArray(responseData) ? responseData[0] : responseData;
+
+    console.log('📊 Datos procesados:', data);
+
+    // Extraer información clave
+    const webhookResponse = {
+        // Datos personales
+        nombre: data['Persona - Nombre'] || data['ID'] || originalFormData.nombre,
+        email: data['Persona - Correo electrónico - Trabajo'] || originalFormData.email,
+        telefono: data['Persona - Teléfono - Otro'] || originalFormData.telefono,
+        codigoPostal: data['Persona - Código postal'] || originalFormData.codigoPostal,
+
+        // Análisis de IA
+        nivelIntencion: data['Persona - Analisis de Intencion'] || data['RESPUESTAS IA'] || 'No disponible',
+        respuestaUsuario: data['RESPUESTAS USUARIO'] || originalFormData.razon,
+
+        // BEC (Business Evaluation Criteria)
+        bec: null
+    };
+
+    // Parsear el BEC si viene en formato JSON string
+    if (data['BEC']) {
+        try {
+            // Limpiar el string de BEC (puede venir con ```json```)
+            let becString = data['BEC'];
+            becString = becString.replace(/```json\n/g, '').replace(/```/g, '').trim();
+            webhookResponse.bec = JSON.parse(becString);
+            console.log('📋 BEC parseado:', webhookResponse.bec);
+        } catch (error) {
+            console.warn('⚠️ No se pudo parsear el BEC:', error);
+            webhookResponse.bec = { raw: data['BEC'] };
+        }
+    }
+
+    // Guardar en localStorage para referencia futura
+    localStorage.setItem('lastWebhookResponse', JSON.stringify(webhookResponse));
+    localStorage.setItem('lastSubmissionDate', new Date().toISOString());
+
+    // Mostrar mensaje de éxito con los datos
+    showSuccessWithResults(webhookResponse);
+}
+
 // Resetear botón de envío
 function resetSubmitButton() {
     const submitBtn = document.querySelector('.btn-submit');
@@ -666,8 +715,8 @@ function resetSubmitButton() {
     buttonIcon.textContent = '✓';
 }
 
-// Mostrar mensaje de éxito
-function showSuccessMessage() {
+// Mostrar mensaje de éxito con resultados
+function showSuccessWithResults(webhookResponse) {
     const form = document.querySelector('.multi-step-form');
     const progressBar = document.querySelector('.progress-bar-container');
     const successMessage = document.getElementById('successMessage');
@@ -678,11 +727,130 @@ function showSuccessMessage() {
     setTimeout(() => {
         form.style.display = 'none';
         progressBar.style.display = 'none';
+
+        // Actualizar el contenido del mensaje de éxito con los resultados
+        updateSuccessMessageContent(successMessage, webhookResponse);
+
         successMessage.classList.add('show');
 
         // Confetti effect
         createConfetti();
     }, 400);
+}
+
+// Actualizar contenido del mensaje de éxito con resultados del webhook
+function updateSuccessMessageContent(successMessage, webhookResponse) {
+    // Determinar el emoji según el nivel de intención
+    const nivelEmoji = {
+        'Alto': '🔥',
+        'Medio': '💭',
+        'Bajo': '📋'
+    };
+
+    const emoji = nivelEmoji[webhookResponse.nivelIntencion] || '✨';
+
+    // Construir el HTML con los resultados
+    let resultadosHTML = `
+        <div class="success-icon">✓</div>
+        <h2>¡Gracias por completar el formulario!</h2>
+        <p class="success-subtitle">
+            Hemos recibido tu información y la hemos analizado exitosamente.
+        </p>
+        
+        <div class="results-container">
+            <div class="result-card">
+                <div class="result-header">
+                    <span class="result-icon">${emoji}</span>
+                    <h3>Análisis de Intención</h3>
+                </div>
+                <div class="result-content">
+                    <div class="result-badge nivel-${webhookResponse.nivelIntencion.toLowerCase()}">
+                        ${webhookResponse.nivelIntencion}
+                    </div>
+                </div>
+            </div>
+    `;
+
+    // Agregar información del BEC si está disponible
+    if (webhookResponse.bec && webhookResponse.bec.Recomendacion_Principal) {
+        resultadosHTML += `
+            <div class="result-card">
+                <div class="result-header">
+                    <span class="result-icon">🎯</span>
+                    <h3>Recomendación Principal</h3>
+                </div>
+                <div class="result-content">
+                    <p class="result-text">${webhookResponse.bec.Recomendacion_Principal}</p>
+                </div>
+            </div>
+        `;
+
+        if (webhookResponse.bec.Alternativa_Viable) {
+            resultadosHTML += `
+                <div class="result-card">
+                    <div class="result-header">
+                        <span class="result-icon">💡</span>
+                        <h3>Alternativa Viable</h3>
+                    </div>
+                    <div class="result-content">
+                        <p class="result-text">${webhookResponse.bec.Alternativa_Viable}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        if (webhookResponse.bec.Complementos_Sugeridos && webhookResponse.bec.Complementos_Sugeridos.length > 0) {
+            resultadosHTML += `
+                <div class="result-card">
+                    <div class="result-header">
+                        <span class="result-icon">🌟</span>
+                        <h3>Complementos Sugeridos</h3>
+                    </div>
+                    <div class="result-content">
+                        <ul class="complementos-list">
+                            ${webhookResponse.bec.Complementos_Sugeridos.map(comp => `<li>${comp}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    resultadosHTML += `
+            <div class="result-card contact-info">
+                <div class="result-header">
+                    <span class="result-icon">👤</span>
+                    <h3>Información de Contacto</h3>
+                </div>
+                <div class="result-content">
+                    <p><strong>Nombre:</strong> ${webhookResponse.nombre}</p>
+                    <p><strong>Email:</strong> ${webhookResponse.email}</p>
+                    <p><strong>Teléfono:</strong> ${webhookResponse.telefono}</p>
+                </div>
+            </div>
+        </div>
+        
+        <button id="btnRestart" class="btn-restart">Enviar Otro Formulario</button>
+    `;
+
+    successMessage.innerHTML = resultadosHTML;
+
+    // Agregar event listener al botón de restart
+    const btnRestart = successMessage.querySelector('#btnRestart');
+    if (btnRestart) {
+        btnRestart.addEventListener('click', resetForm);
+    }
+}
+
+// Mostrar mensaje de éxito (versión simple, mantenida para compatibilidad)
+function showSuccessMessage() {
+    showSuccessWithResults({
+        nombre: 'Usuario',
+        email: 'No especificado',
+        telefono: 'No especificado',
+        nivelIntencion: 'Medio',
+        bec: null
+    });
 }
 
 // Crear efecto de confetti
