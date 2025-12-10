@@ -679,16 +679,25 @@ function processWebhookResponse(responseData, originalFormData) {
         bec: null
     };
 
-    // Parsear el BEC si viene en formato JSON string
+    // Parsear el BEC - puede venir como string JSON o como objeto
     if (data['BEC']) {
         try {
-            // Limpiar el string de BEC (puede venir con ```json```)
-            let becString = data['BEC'];
-            becString = becString.replace(/```json\n/g, '').replace(/```/g, '').trim();
-            webhookResponse.bec = JSON.parse(becString);
-            console.log('📋 BEC parseado:', webhookResponse.bec);
+            // Si BEC es un objeto, usarlo directamente
+            if (typeof data['BEC'] === 'object' && data['BEC'] !== null) {
+                webhookResponse.bec = data['BEC'];
+                console.log('📋 BEC recibido como objeto:', webhookResponse.bec);
+            }
+            // Si es un string, parsearlo
+            else if (typeof data['BEC'] === 'string') {
+                let becString = data['BEC'];
+                // Limpiar el string de BEC (puede venir con ```json```)
+                becString = becString.replace(/```json\n/g, '').replace(/```/g, '').trim();
+                webhookResponse.bec = JSON.parse(becString);
+                console.log('📋 BEC parseado desde string:', webhookResponse.bec);
+            }
         } catch (error) {
             console.warn('⚠️ No se pudo parsear el BEC:', error);
+            console.warn('BEC recibido:', data['BEC']);
             webhookResponse.bec = { raw: data['BEC'] };
         }
     }
@@ -696,6 +705,8 @@ function processWebhookResponse(responseData, originalFormData) {
     // Guardar en localStorage para referencia futura
     localStorage.setItem('lastWebhookResponse', JSON.stringify(webhookResponse));
     localStorage.setItem('lastSubmissionDate', new Date().toISOString());
+
+    console.log('✅ Webhook response procesado:', webhookResponse);
 
     // Mostrar mensaje de éxito con los datos
     showSuccessWithResults(webhookResponse);
@@ -740,6 +751,16 @@ function showSuccessWithResults(webhookResponse) {
 
 // Actualizar contenido del mensaje de éxito con resultados del webhook
 function updateSuccessMessageContent(successMessage, webhookResponse) {
+    // Debug: Ver qué estamos recibiendo
+    console.log('🎨 Actualizando contenido de éxito con:', webhookResponse);
+    console.log('📋 BEC completo:', webhookResponse.bec);
+    if (webhookResponse.bec) {
+        console.log('📝 Recomendacion_Principal:', webhookResponse.bec.Recomendacion_Principal);
+        console.log('💡 Alternativa_Viable:', webhookResponse.bec.Alternativa_Viable);
+        console.log('📢 Argumento_Venta:', webhookResponse.bec.Argumento_Venta);
+        console.log('🌟 Complementos_Sugeridos:', webhookResponse.bec.Complementos_Sugeridos);
+    }
+
     // Determinar el emoji según el nivel de intención
     const nivelEmoji = {
         'Alto': '🔥',
